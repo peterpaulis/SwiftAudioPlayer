@@ -34,6 +34,7 @@ public class SAPlayer {
     
     private var presenter: SAPlayerPresenter!
     private var player: AudioEngine?
+    private var queuedPlayer: AudioEngine?
     
     /**
     Access the engine of the player. Engine is nil if player has not been initialized with audio.
@@ -302,6 +303,14 @@ extension SAPlayer {
         presenter.handlePlayStreamedAudio(withRemoteUrl: url)
     }
     
+    public func queueSavedAudio(withSavedUrl url:URL, withIdentifier name: String) {
+        presenter.handleQueueSavedAudio(withSavedUrl: url, withIdentifier: name)
+    }
+    
+    public func queueRemoteAudio(withRemoteUrl url:URL, withIdentifier name: String) {
+        presenter.handleQueueStreamedAudio(withSavedUrl: url, withIdentifier: name)
+    }
+    
     /**
      Resets the player to the state before initializing audio and setting media info.
      */
@@ -355,6 +364,28 @@ extension SAPlayer: SAPlayerDelegate {
         var seekToNeedle = needle < 0 ? 0 : needle
         seekToNeedle = needle > Needle(duration ?? 0) ? Needle(duration ?? 0) : needle
         player?.seek(toNeedle: seekToNeedle)
+    }
+    
+    func isReadyToQueueNextItem() -> Bool {
+        return queuedPlayer == nil
+    }
+    
+    func queueAudioDownloaded(withSavedUrl url: AudioURL) {
+        queuedPlayer = AudioDiskEngine(withSavedUrl: url, delegate: presenter)
+    }
+    
+    func queueAudioStreamed(withRemoteUrl url: AudioURL) {
+        Log.test("queued new url")
+        queuedPlayer = AudioStreamEngine(withRemoteUrl: url, delegate: presenter)
+    }
+    
+    func startQueuedItem() {
+        Log.test("starting playing next")
+        player?.pause()
+        player?.invalidate()
+        player = queuedPlayer
+        queuedPlayer = nil
+        player?.play()
     }
 }
 

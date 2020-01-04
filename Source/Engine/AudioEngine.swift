@@ -35,6 +35,7 @@ protocol AudioEngineProtocol {
 }
 
 protocol AudioEngineDelegate: AnyObject {
+    func didCompleteBuffering()
     func didEndPlaying() //for auto play
     func didError()
 }
@@ -106,6 +107,10 @@ class AudioEngine: AudioEngineProtocol {
             
             bufferedSecondsDebouncer = bufferedSeconds
             AudioClockDirector.shared.changeInAudioBuffered(key, buffered: bufferedSeconds)
+            
+            if bufferedSeconds.bufferingProgress > 1.0 {
+                delegate?.didCompleteBuffering()
+            }
         }
     }
     

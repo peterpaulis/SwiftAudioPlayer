@@ -29,7 +29,18 @@ import MediaPlayer
 
 class SAPlayerPresenter {
     weak var delegate: SAPlayerDelegate?
-    var shouldPlayImmediately = false //for auto-play
+    
+    struct QueuedItem {
+        var url: URL
+        var id: ID
+        
+        enum EngineType {
+            case disk
+            case stream
+        }
+        
+        var requiredEngine: EngineType
+    }
     
     var needle: Needle?
     var duration: Duration?
@@ -39,6 +50,7 @@ class SAPlayerPresenter {
     private var mediaInfo: SALockScreenInfo?
     
     private var urlKeyMap: [Key: URL] = [:]
+    private var queuedItems: [QueuedItem] = []
     
     var durationRef:UInt = 0
     var needleRef:UInt = 0
@@ -48,8 +60,6 @@ class SAPlayerPresenter {
         self.delegate = delegate
         
         delegate?.setLockScreenControls(presenter: self)
-        
-        prepareNextEpisodeToPlay()
     }
     
     func getUrl(forKey key: Key) -> URL? {
@@ -70,6 +80,14 @@ class SAPlayerPresenter {
         AudioClockDirector.shared.detachFromChangesInDuration(withID: durationRef)
         AudioClockDirector.shared.detachFromChangesInNeedle(withID: needleRef)
         AudioClockDirector.shared.detachFromChangesInPlayingStatus(withID: playingStatusRef)
+    }
+    
+    func handleQueueSavedAudio(withSavedUrl url: URL, withIdentifier name: ID) {
+        queuedItems.append(QueuedItem(url: url, id: name, requiredEngine: .disk))
+    }
+    
+    func handleQueueStreamedAudio(withSavedUrl url: URL, withIdentifier name: ID) {
+        queuedItems.append(QueuedItem(url: url, id: name, requiredEngine: .stream))
     }
     
     func handlePlaySavedAudio(withSavedUrl url: URL) {
@@ -188,16 +206,29 @@ extension SAPlayerPresenter: AudioEngineDelegate {
         Log.monitor("We should have handled engine error")
     }
     
+    func didCompleteBuffering() {
+        Log.test("complete buffer")
+        guard delegate?.isReadyToQueueNextItem() ?? false else {
+            Log.info("skipping queuing next item since there is already a queued item for playback")
+            return
+        }
+        
+        guard let item = queuedItems.first else {
+            Log.info("no items to queue, skipping queuing")
+            return
+        }
+        
+        switch item.requiredEngine {
+        case .disk:
+            delegate?.queueAudioDownloaded(withSavedUrl: item.url)
+        case .stream:
+            delegate?.queueAudioStreamed(withRemoteUrl: item.url)
+        }
+    }
+    
     func didEndPlaying() {
-        // TODO
-//        playNextEpisode()
+        Log.test("did end playing")
+        delegate?.startQueuedItem()
     }
 }
 
-//MARK:- Autoplay
-//FIXME: This needs to be refactored
-extension SAPlayerPresenter {
-    func prepareNextEpisodeToPlay() {
-        // TODO
-    }
-}
