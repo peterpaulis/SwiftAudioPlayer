@@ -110,6 +110,7 @@ class AudioThrottler: AudioThrottleable {
     var largestPollingOffsetDifference: UInt64 = 1
     
     required init(withRemoteUrl url: AudioURL, withDelegate delegate: AudioThrottleDelegate) {
+        Log.info("start throttler with url: \(url)")
         self.url = url
         self.delegate = delegate
         

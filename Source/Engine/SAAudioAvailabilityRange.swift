@@ -61,6 +61,6 @@ public struct SAAudioAvailabilityRange {
     }
     
     public func isCompletelyBuffered() -> Bool {
-        return startingNeedle + durationLoadedByNetwork >= predictedDurationToLoad
+        return bufferingProgress > 0.999 && !bufferingProgress.isInfinite
     }
 }

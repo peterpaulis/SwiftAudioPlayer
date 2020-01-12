@@ -134,7 +134,7 @@ class AudioStreamEngine: AudioEngine {
     }
     
     init(withRemoteUrl url: AudioURL, delegate:AudioEngineDelegate?) {
-        Log.info(url)
+        Log.info("start streaming engine with url: \(url)")
         super.init(url: url, delegate: delegate, engineAudioFormat: AudioEngine.defaultEngineAudioFormat)
         do {
             converter = try AudioConverter(withRemoteUrl: url, toEngineAudioFormat: AudioEngine.defaultEngineAudioFormat)

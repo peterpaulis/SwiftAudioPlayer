@@ -108,7 +108,7 @@ class AudioEngine: AudioEngineProtocol {
             bufferedSecondsDebouncer = bufferedSeconds
             AudioClockDirector.shared.changeInAudioBuffered(key, buffered: bufferedSeconds)
             
-            if bufferedSeconds.bufferingProgress > 1.0 && !bufferedSeconds.bufferingProgress.isInfinite {
+            if bufferedSeconds.isCompletelyBuffered() {
                 Log.test(bufferedSeconds.bufferingProgress)
                 delegate?.didCompleteBuffering()
             }
@@ -160,7 +160,7 @@ class AudioEngine: AudioEngineProtocol {
     
     func updateIsPlaying() {
         if !bufferedSeconds.isPlayable {
-            if bufferedSeconds.bufferingProgress > 0.999 {
+            if bufferedSeconds.isCompletelyBuffered() {
                 playingStatus = .ended
             } else {
                 playingStatus = .buffering

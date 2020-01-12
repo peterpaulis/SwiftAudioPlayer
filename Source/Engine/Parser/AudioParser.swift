@@ -147,6 +147,7 @@ class AudioParser: AudioParsable {
     
     
     init(withRemoteUrl url: AudioURL, parsedFileAudioFormatCallback: @escaping(AVAudioFormat) -> ()) throws {
+        Log.info("start parser with url: \(url)")
         self.url = url
         self.parsedFileAudioFormatCallback = parsedFileAudioFormatCallback
         self.throttler = AudioThrottler(withRemoteUrl: url, withDelegate: self)

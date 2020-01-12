@@ -76,6 +76,7 @@ class AudioConverter: AudioConvertable {
     var currentAudioPacketIndex: AVAudioPacketCount = 0
     
     required init(withRemoteUrl url: AudioURL, toEngineAudioFormat: AVAudioFormat) throws {
+        Log.info("start converter with url: \(url)")
         self.engineAudioFormat = toEngineAudioFormat
         do {
             parser = try AudioParser(withRemoteUrl: url, parsedFileAudioFormatCallback: {
