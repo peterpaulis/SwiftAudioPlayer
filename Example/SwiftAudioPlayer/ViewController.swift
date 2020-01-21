@@ -257,6 +257,7 @@ class ViewController: UIViewController {
     
     @IBAction func streamTouched(_ sender: Any) {
         if !isStreaming {
+            print("[TEST  ❇️❇️❇️❇️] start streaming")
             SAPlayer.shared.startRemoteAudio(withRemoteUrl: selectedAudio.url)
             streamButton.setTitle("Cancel streaming", for: .normal)
             downloadButton.isEnabled = false

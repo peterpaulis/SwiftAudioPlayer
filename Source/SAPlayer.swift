@@ -330,6 +330,7 @@ extension SAPlayer: SAPlayerDelegate {
     }
     
     func startAudioStreamed(withRemoteUrl url: AudioURL) {
+        Log.test("SAPlayer start streaming")
         player?.pause()
         player?.invalidate()
         player = AudioStreamEngine(withRemoteUrl: url, delegate: presenter)
