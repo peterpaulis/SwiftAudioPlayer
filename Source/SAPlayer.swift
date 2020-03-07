@@ -312,6 +312,10 @@ extension SAPlayer {
         self.mediaInfo = mediaInfo
         presenter.handlePlayStreamedAudio(withRemoteUrl: url)
     }
+
+    public func stopStreamingRemoteAudio() {
+        presenter.handleStopStreamingAudio()
+    }
     
     public func queueSavedAudio(withSavedUrl url:URL, withIdentifier name: String) {
         presenter.handleQueueSavedAudio(withSavedUrl: url, withIdentifier: name)
@@ -344,6 +348,12 @@ extension SAPlayer: SAPlayerDelegate {
         player?.pause()
         player?.invalidate()
         player = AudioStreamEngine(withRemoteUrl: url, delegate: presenter)
+    }
+    
+    func clearEngine() {
+        player?.pause()
+        player?.invalidate()
+        player = nil
     }
     
     func playEngine() {

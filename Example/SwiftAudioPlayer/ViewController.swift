@@ -151,6 +151,8 @@ class ViewController: UIViewController {
             
             if buffer.bufferingProgress >= 0.99 {
                 self.streamButton.isEnabled = false
+            } else {
+                self.streamButton.isEnabled = true
             }
             
             self.isPlayable = buffer.isReadyForPlaying
@@ -273,13 +275,17 @@ class ViewController: UIViewController {
             SAPlayer.shared.startRemoteAudio(withRemoteUrl: selectedAudio.url)
             streamButton.setTitle("Cancel streaming", for: .normal)
             downloadButton.isEnabled = false
+            isStreaming = true
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
                 let acquired = AudioInfo(index: 1)
                 SAPlayer.shared.queueRemoteAudio(withRemoteUrl: acquired.url, withIdentifier: acquired.title)
             }
         } else {
-            // TODO
+            SAPlayer.shared.stopStreamingRemoteAudio()
+            streamButton.setTitle("Stream", for: .normal)
+            downloadButton.isEnabled = true
+            isStreaming = false
         }
     }
     
